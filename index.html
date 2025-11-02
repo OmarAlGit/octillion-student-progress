@@ -2,236 +2,248 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Student Progress – Tracking Grid</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Student Progress Dashboard</title>
   <style>
-    :root{
-      --brand:#0d47a1;
-      --bg:#f6f7fb;
-      --card:#ffffff;
-      --text:#1f2937;
-      --muted:#6b7280;
-      --ok:#2e7d32;
-      --no:#c62828;
-      --border:#e5e7eb;
-      --row:#f9fafb;
-    }
-    *{box-sizing:border-box}
-    body{
-      margin:0; background:linear-gradient(135deg,#f8fafc,#e8f0fe);
-      color:var(--text); font-family:Segoe UI,system-ui,Arial,sans-serif;
-    }
-    header{
-      position:sticky; top:0; z-index:5;
-      background:var(--brand); color:#fff; text-align:center;
-      padding:14px 10px; box-shadow:0 2px 10px rgba(0,0,0,.08);
-      letter-spacing:.2px; font-weight:600;
-    }
-    main{ max-width:1400px; margin:22px auto; padding:0 16px; }
-    .card{
-      background:var(--card); border-radius:16px; padding:16px;
-      box-shadow:0 10px 30px rgba(13,71,161,.08);
-      border:1px solid var(--border);
+    :root {
+      --brand: #1565c0;
+      --header-bg: #1976d2;
+      --header-text: #ffffff;
+      --ok: #2e7d32;
+      --no: #c62828;
+      --border: #e0e0e0;
+      --bg: #f5f7fa;
+      --row-alt: #f9fbfd;
+      --sticky-bg: #e8f0fe;
+      --text: #1a1a1a;
     }
 
-    /* Grid wrapper (scrolls horizontally on small screens) */
-    .grid-wrap{
-      overflow:auto; border-radius:12px; border:1px solid var(--border);
-      background:#fff;
+    body {
+      font-family: "Segoe UI", Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      margin: 0;
     }
 
-    table{
-      border-collapse:separate; border-spacing:0; width:max-content; min-width:100%;
-      font-size:14px; line-height:1.35;
+    header {
+      background: var(--header-bg);
+      color: var(--header-text);
+      text-align: center;
+      padding: 1rem;
+      font-size: 1.6rem;
+      font-weight: 600;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
     }
-    thead th{
-      position:sticky; top:0; z-index:3;
-      background:var(--brand); color:#fff; font-weight:600;
-      padding:10px 12px; border-bottom:1px solid rgba(255,255,255,.25);
-      white-space:nowrap;
+
+    main {
+      padding: 2rem;
+      max-width: 1600px;
+      margin: auto;
     }
-    th, td{
-      border-right:1px solid var(--border);
-      border-bottom:1px solid var(--border);
-      padding:8px 10px; background:#fff;
+
+    .sheet-container {
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+      overflow: auto;
+      border: 1px solid var(--border);
     }
-    tbody tr:nth-child(even) td{ background:var(--row); }
 
-    /* Sticky first two columns (Task Code, Topic/Desc) */
-    .sticky-1{ position:sticky; left:0; z-index:2; background:#eef2ff; font-weight:600; }
-    .sticky-2{ position:sticky; left:180px; z-index:2; background:#eef2ff; min-width:280px; }
-    /* Make first header cells sticky, too */
-    thead th.sticky-1{ left:0; z-index:4; background:#0c3f91; }
-    thead th.sticky-2{ left:180px; z-index:4; background:#0c3f91; }
-
-    /* Cell badges */
-    .cell{ display:flex; align-items:center; gap:8px; }
-    .ok{ color:var(--ok); font-weight:600; }
-    .no{ color:var(--no); font-weight:600; }
-    .muted{ color:var(--muted); }
-
-    .legend{
-      display:flex; gap:18px; align-items:center; flex-wrap:wrap;
-      color:var(--muted); font-size:13px; margin:10px 0 14px;
+    table {
+      border-collapse: collapse;
+      width: max-content;
+      min-width: 100%;
+      font-size: 14px;
     }
-    .pill{ display:inline-flex; align-items:center; gap:6px; padding:6px 10px;
-      border-radius:999px; background:#eef2ff; border:1px solid var(--border) }
 
-    .toolbar{
-      display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:10px;
+    th, td {
+      border: 1px solid var(--border);
+      padding: 8px 12px;
+      text-align: center;
+      white-space: nowrap;
     }
-    .updated{ color:var(--muted); font-size:12px; }
-    .title{ font-size:18px; font-weight:700; color:var(--brand); }
 
-    @media (max-width: 900px){
-      .sticky-2{ left:160px; min-width:220px; }
-      thead th.sticky-2{ left:160px; }
+    thead th {
+      position: sticky;
+      top: 0;
+      background: var(--header-bg);
+      color: var(--header-text);
+      font-weight: 600;
+      z-index: 3;
+    }
+
+    tbody tr:nth-child(even) td {
+      background: var(--row-alt);
+    }
+
+    td.sticky-col {
+      position: sticky;
+      left: 0;
+      z-index: 2;
+      background: var(--sticky-bg);
+      font-weight: 600;
+      text-align: left;
+    }
+
+    td.sticky-col-2 {
+      position: sticky;
+      left: 180px;
+      z-index: 2;
+      background: var(--sticky-bg);
+      font-weight: 600;
+      text-align: left;
+    }
+
+    thead th.sticky-col {
+      left: 0;
+      z-index: 4;
+      background: var(--brand);
+    }
+
+    thead th.sticky-col-2 {
+      left: 180px;
+      z-index: 4;
+      background: var(--brand);
+    }
+
+    .ok {
+      color: var(--ok);
+      font-weight: 600;
+    }
+
+    .no {
+      color: var(--no);
+      font-weight: 600;
+    }
+
+    .muted {
+      color: #777;
+    }
+
+    .footer {
+      text-align: right;
+      font-size: 12px;
+      color: #777;
+      margin-top: 10px;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 1rem;
+      color: var(--brand);
+    }
+
+    @media (max-width: 900px) {
+      td.sticky-col-2, thead th.sticky-col-2 { left: 140px; }
     }
   </style>
 </head>
 <body>
-  <header>📊 Student Progress – Tracking Grid</header>
+  <header>📊 Student Progress Dashboard</header>
   <main>
-    <div class="card">
-      <div class="toolbar">
-        <div class="title">Live from Google Sheets (Web Data)</div>
-        <div class="legend">
-          <span class="pill"><span class="ok">✅</span> Completed (date/value)</span>
-          <span class="pill"><span class="no">❌</span> N / empty</span>
-          <span class="pill"><span>Σ</span> Totals column kept</span>
-        </div>
-      </div>
-      <div class="updated" id="updated">Loading…</div>
-      <div class="grid-wrap">
-        <table id="grid">
-          <thead></thead>
-          <tbody></tbody>
-        </table>
-      </div>
+    <div class="sheet-container">
+      <div id="loading" class="loading">Loading latest data...</div>
+      <table id="sheet">
+        <thead></thead>
+        <tbody></tbody>
+      </table>
     </div>
+    <div class="footer" id="last-updated">Last updated: —</div>
   </main>
 
   <script>
-    // 👉 REPLACE with your published CSV link:
-    const sheetUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRTW5UzVfnAcBJdW9fSL7SXFc0wtUV5ftFWKaFExTPhq7FTv5QZ0rHqjs4sLlBnFHzCi0ThHMzV3rT_/pub?gid=1451995921&single=true&output=csv";
+    const sheetUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRTW5UzVfnAcBJdW9fSL7SXFc0wtUV5ftFWKaFExTPhq7FTv5QZ0rHqjs4sLlBnFHzCi0ThHMzV3rT_/pub?gid=1926586971&single=true&output=csv";
 
-    // --- utils ---
-    const fmt = n => n < 10 ? "0"+n : n;
-    function excelSerialToDate(serial){
-      const base = new Date(Date.UTC(1899,11,30)); // Google/Excel epoch
-      const d = new Date(base.getTime() + serial * 86400000);
-      const dd = fmt(d.getUTCDate()), mm = fmt(d.getUTCMonth()+1), yy = d.getUTCFullYear();
-      return `${dd}/${mm}/${yy}`;
-    }
-    function isLikelySerial(val){
-      if(!/^\d+$/.test(val)) return false;
-      const n = Number(val);
-      // Typical modern date serial range
-      return n >= 30000 && n <= 60000;
-    }
-    function isDateText(val){
-      // Accept 1/2/2024 or 01/02/2024 (and with // typos)
-      return /^(0?[1-9]|[12]\d|3[01])[\/]{1,2}(0?[1-9]|1[0-2])[\/]{1,2}(19|20)\d{2}$/.test(val.trim());
-    }
-    function cleanDate(val){
-      const v = val.replaceAll("//","/").trim();
-      if (isLikelySerial(v)) return excelSerialToDate(Number(v));
-      if (isDateText(v)) {
-        // normalise to DD/MM/YYYY
-        const parts = v.split(/[\/]+/).map(x=>x.trim());
-        const dd = fmt(Number(parts[0])), mm = fmt(Number(parts[1])), yy = parts[2];
-        return `${dd}/${mm}/${yy}`;
-      }
-      return v; // not a date; may be "N" or blank
-    }
+    const table = document.getElementById("sheet");
+    const thead = table.querySelector("thead");
+    const tbody = table.querySelector("tbody");
+    const loading = document.getElementById("loading");
+    const updated = document.getElementById("last-updated");
 
-    // Robust CSV parser (handles quotes and commas)
-    function parseCSV(text){
+    function parseCSV(text) {
       const rows = [];
-      let row = [], i = 0, cur = "", inQ = false;
-      while(i < text.length){
-        const ch = text[i], nxt = text[i+1];
-        if(inQ){
-          if(ch === '"' && nxt === '"'){ cur += '"'; i+=2; continue; }
-          if(ch === '"'){ inQ = false; i++; continue; }
-          cur += ch; i++; continue;
-        }else{
-          if(ch === '"'){ inQ = true; i++; continue; }
-          if(ch === ','){ row.push(cur); cur=""; i++; continue; }
-          if(ch === '\r'){ i++; continue; }
-          if(ch === '\n'){ row.push(cur); rows.push(row); row=[]; cur=""; i++; continue; }
-          cur += ch; i++; continue;
+      let current = [], i = 0, inQuotes = false;
+      while (i < text.length) {
+        const char = text[i];
+        if (inQuotes) {
+          if (char === '"' && text[i + 1] === '"') { current.push('"'); i++; }
+          else if (char === '"') inQuotes = false;
+          else current.push(char);
+        } else {
+          if (char === '"') inQuotes = true;
+          else if (char === ',') { rows.push(current.join('')); current = []; }
+          else if (char === '\n') { rows.push(current.join('')); rows.push('\n'); current = []; }
+          else current.push(char);
         }
+        i++;
       }
-      if(cur.length || row.length) { row.push(cur); rows.push(row); }
-      return rows;
+      rows.push(current.join(''));
+      const lines = [];
+      let line = [];
+      rows.forEach(r => {
+        if (r === '\n') { lines.push(line); line = []; }
+        else line.push(r);
+      });
+      if (line.length) lines.push(line);
+      return lines;
     }
 
-    function renderGrid(matrix){
-      const grid = document.getElementById("grid");
-      const thead = grid.querySelector("thead");
-      const tbody = grid.querySelector("tbody");
-      if (!matrix || !matrix.length){ thead.innerHTML=""; tbody.innerHTML=""; return; }
-
-      // We render EXACT layout:
-      // row0 = headers, col0 = Task Code, col1 = Topic/Description, col2+ = students (including Totals if present)
-      const headers = matrix[0];
-      const data = matrix.slice(1);
-
-      // Build header (sticky first two columns)
-      const ths = headers.map((h, idx) => {
-        const cls = idx===0 ? ' class="sticky-1"' : (idx===1 ? ' class="sticky-2"' : '');
-        return `<th${cls}>${h || ""}</th>`;
-      }).join("");
-      thead.innerHTML = `<tr>${ths}</tr>`;
-
-      // Build rows
-      const rowsHtml = data.map(r => {
-        return "<tr>" + r.map((cell, cIdx) => {
-          let content = (cell ?? "").toString();
-
-          // Style first two columns as sticky label columns
-          const stickyCls = cIdx===0 ? "sticky-1" : (cIdx===1 ? "sticky-2" : "");
-
-          // Decide how to render student cells (cIdx >= 2)
-          if (cIdx >= 2){
-            const raw = content.trim();
-            if (!raw){
-              content = `<span class="cell muted">—</span>`;
-            } else if (/^n$/i.test(raw)){
-              content = `<span class="cell no">❌ N</span>`;
-            } else {
-              const dateOrVal = cleanDate(raw);
-              // treat any non-N value as completed
-              content = `<span class="cell ok">✅ ${dateOrVal}</span>`;
-            }
-          }
-          return `<td class="${stickyCls}">${content}</td>`;
-        }).join("") + "</tr>";
-      }).join("");
-      tbody.innerHTML = rowsHtml;
+    function excelSerialToDate(serial) {
+      const base = new Date(Date.UTC(1899, 11, 30));
+      const date = new Date(base.getTime() + serial * 86400000);
+      return date.toLocaleDateString("en-GB");
     }
 
-    async function load(){
-      const updated = document.getElementById("updated");
-      try{
-        const res = await fetch(sheetUrl + "&cacheBust=" + Date.now());
-        if(!res.ok) throw new Error("HTTP " + res.status);
+    function formatCell(value) {
+      const val = value.trim();
+      if (!val) return `<span class="muted">—</span>`;
+      if (/^n$/i.test(val)) return `<span class="no">❌ N</span>`;
+      if (/^\d+$/.test(val)) {
+        const n = Number(val);
+        if (n >= 30000 && n <= 60000) return `<span class="ok">✅ ${excelSerialToDate(n)}</span>`;
+      }
+      return `<span class="ok">✅ ${val}</span>`;
+    }
+
+    async function loadSheet() {
+      try {
+        loading.style.display = "block";
+        const res = await fetch(sheetUrl + "&t=" + Date.now());
         const text = await res.text();
-        const matrix = parseCSV(text);
-        renderGrid(matrix);
-        const d = new Date();
-        updated.textContent = "Last updated: " + 
-          d.getHours().toString().padStart(2,"0")+":"+
-          d.getMinutes().toString().padStart(2,"0");
-      }catch(e){
-        console.error(e);
-        updated.textContent = "Error loading data. Check the published CSV link.";
+        const rows = parseCSV(text);
+        if (!rows.length) throw new Error("Empty data");
+
+        loading.style.display = "none";
+        thead.innerHTML = "";
+        tbody.innerHTML = "";
+
+        const headerRow = rows[0];
+        const headerHTML = headerRow.map((h, i) => {
+          if (i === 0) return `<th class="sticky-col">${h}</th>`;
+          if (i === 1) return `<th class="sticky-col-2">${h}</th>`;
+          return `<th>${h}</th>`;
+        }).join("");
+        thead.innerHTML = `<tr>${headerHTML}</tr>`;
+
+        rows.slice(1).forEach(row => {
+          const rowHTML = row.map((cell, i) => {
+            if (i === 0) return `<td class="sticky-col">${cell}</td>`;
+            if (i === 1) return `<td class="sticky-col-2">${cell}</td>`;
+            return `<td>${formatCell(cell)}</td>`;
+          }).join("");
+          tbody.innerHTML += `<tr>${rowHTML}</tr>`;
+        });
+
+        const now = new Date();
+        updated.textContent = `Last updated: ${now.toLocaleTimeString()}`;
+      } catch (err) {
+        console.error(err);
+        loading.textContent = "⚠️ Error loading data.";
       }
     }
 
-    load();
-    setInterval(load, 120000); // refresh every 2 minutes
+    loadSheet();
+    setInterval(loadSheet, 120000);
   </script>
 </body>
 </html>
