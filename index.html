@@ -8,49 +8,58 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#0f1822;--panel:#0b1520;--firstcol:#cfd3d7;--head:#d9ecff;--grid:#223144;
-  --red:#e74c3c;--amber:#f39c12;--green:#27ae60;--muted:#90a4bf;
+  --bg:#0f1822; --panel:#0b1520; --firstcol:#cfd3d7; --head:#d9ecff; --grid:#223144;
+  --red:#e74c3c; --amber:#f39c12; --green:#27ae60; --muted:#90a4bf;
 }
 *{box-sizing:border-box}
+html,body{height:100%}
 body{margin:0;background:var(--bg);color:#fff;font-family:"Inter",system-ui,sans-serif}
+
 header{background:#0b1520;text-align:center;font-weight:800;padding:14px;border-bottom:1px solid var(--grid)}
+
 .wrap{max-width:1800px;margin:18px auto;padding:0 16px}
 .board{border:1px solid var(--grid);background:var(--panel);border-radius:14px;overflow:auto;box-shadow:0 20px 60px rgba(0,0,0,.35)}
 table{border-collapse:separate;border-spacing:0;width:max-content;min-width:100%}
 th,td{border-right:1px solid var(--grid);border-bottom:1px solid var(--grid)}
 
-/* parent subject header */
-.parent-row th{
-  background:var(--head);color:#0c1722;font-weight:800;text-align:center;
-  font-size:20px;padding:10px 0;border-bottom:2px solid var(--grid);
+/* top headers (two lines) */
+thead th{
+  position:sticky; top:0; z-index:5;
+  background:var(--head); color:#0c1722; text-align:center;
+  padding:10px 8px; min-width:260px; border-bottom:2px solid var(--grid);
 }
-
-/* topic headers */
-.topic-row th{
-  background:var(--head);color:#0c1722;text-align:center;padding:10px 6px;
-  min-width:220px;font-size:16px;font-weight:700;
+thead th:first-child{
+  background:var(--firstcol); position:sticky; left:0; z-index:6; min-width:260px;
 }
-.topic-row .h-top{display:block;font-weight:800;font-size:18px}
-.topic-row .h-sub{display:block;font-weight:600;font-size:14px;margin-top:2px;opacity:.9}
+.h-top{display:block; font-weight:800; font-size:22px; line-height:1.2}
+.h-sub{display:block; font-weight:700; font-size:16px; opacity:.9; margin-top:4px}
 
-tbody td{text-align:center;padding:12px 10px;background:#0f1b27}
-tbody tr:nth-child(even) td{background:#0e1a25}
+/* body cells */
+tbody td{
+  background:#0f1b27; text-align:center; padding:16px;
+}
+tbody tr:nth-child(even) td{ background:#0e1a25 }
 tbody td:first-child{
-  background:var(--firstcol);color:#0b0f13;font-weight:700;
-  position:sticky;left:0;z-index:4;text-align:left;padding-left:10px;min-width:180px;
+  background:var(--firstcol); color:#0b0f13; font-weight:800;
+  position:sticky; left:0; z-index:4; text-align:left; padding:16px 12px; min-width:240px;
 }
 
-/* status cells */
-.cell{margin:auto;width:90%;border-radius:18px;padding:12px 10px;color:#fff;
-      box-shadow:inset 0 0 0 2px rgba(255,255,255,.06);font-weight:700}
-.red{background:var(--red)}.amber{background:var(--amber)}.green{background:var(--green)}
+/* status blocks */
+.cell{
+  margin:auto; width:92%; max-width:420px; border-radius:22px; padding:16px 18px; color:#fff;
+  box-shadow:inset 0 0 0 2px rgba(255,255,255,.08); text-align:left;
+}
+.cell .row{display:flex; gap:8px}
+.cell .lab{font-weight:800}
+.cell .val{font-weight:700}
+.red{background:var(--red)} .amber{background:var(--amber)} .green{background:var(--green)}
 
 /* legend */
-.legend{display:flex;gap:12px;align-items:center;justify-content:flex-end;
-        color:var(--muted);font-size:13px;padding:8px 6px}
-.legend .dot{width:12px;height:12px;border-radius:50%;display:inline-block}
-.dot.red{background:var(--red)}.dot.amber{background:var(--amber)}.dot.green{background:var(--green)}
-.stamp{margin-left:auto;font-size:12px}
+.legend{display:flex; gap:14px; align-items:center; justify-content:center; color:var(--muted); font-size:13px; padding:10px}
+.legend .pill{display:flex; align-items:center; gap:8px; padding:6px 10px; border-radius:999px; background:#101b27; border:1px solid var(--grid)}
+.legend .dot{width:12px; height:12px; border-radius:50%}
+.dot.green{background:var(--green)} .dot.amber{background:var(--amber)} .dot.red{background:var(--red)}
+.stamp{color:var(--muted); font-size:12px; text-align:right; padding:6px}
 </style>
 </head>
 <body>
@@ -61,145 +70,159 @@ tbody td:first-child{
     <table id="grid"><thead id="thead"></thead><tbody id="tbody"></tbody></table>
   </div>
   <div class="legend">
-    <span><span class="dot green"></span> Completed</span>
-    <span><span class="dot amber"></span> In Progress</span>
-    <span><span class="dot red"></span> Not Started</span>
-    <span class="stamp" id="stamp">Loading…</span>
+    <span class="pill"><span class="dot green"></span> Completed</span>
+    <span class="pill"><span class="dot amber"></span> In Progress</span>
+    <span class="pill"><span class="dot red"></span> Not Started</span>
   </div>
+  <div class="stamp" id="stamp">Loading…</div>
 </div>
 
 <script>
-const SHEET_URL =
- "https://docs.google.com/spreadsheets/d/e/2PACX-1vRTW5UzVfnAcBJdW9fSL7SXFc0wtUV5ftFWKaFExTPhq7FTv5QZ0rHqjs4sLlBnFHzCi0ThHMzV3rT_/pub?gid=1926586971&single=true&output=csv";
+const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRTW5UzVfnAcBJdW9fSL7SXFc0wtUV5ftFWKaFExTPhq7FTv5QZ0rHqjs4sLlBnFHzCi0ThHMzV3rT_/pub?gid=1926586971&single=true&output=csv";
 
-/* --- csv parse --- */
+/* -------- CSV parser (handles quotes) -------- */
 function parseCSV(t){
   const rows=[], r=[]; let i=0, c="", q=false;
-  const push=()=>{r.push(c);c="";};
-  const newRow=()=>{rows.push(r.slice());r.length=0;};
+  const push=()=>{ r.push(c); c=""; };
+  const newRow=()=>{ rows.push(r.slice()); r.length=0; };
   while(i<t.length){
-    const ch=t[i],n=t[i+1];
+    const ch=t[i], n=t[i+1];
     if(q){
-      if(ch=='"'&&n=='"'){c+='"';i+=2;continue;}
-      if(ch=='"'){q=false;i++;continue;}
-      c+=ch;i++;continue;
+      if(ch=='"' && n=='"'){ c+='"'; i+=2; continue; }
+      if(ch=='"'){ q=false; i++; continue; }
+      c+=ch; i++; continue;
     }else{
-      if(ch=='"'){q=true;i++;continue;}
-      if(ch==','){push();i++;continue;}
-      if(ch=='\r'){i++;continue;}
-      if(ch=='\n'){push();newRow();i++;continue;}
-      c+=ch;i++;continue;
+      if(ch=='"'){ q=true; i++; continue; }
+      if(ch==','){ push(); i++; continue; }
+      if(ch=='\r'){ i++; continue; }
+      if(ch=='\n'){ push(); newRow(); i++; continue; }
+      c+=ch; i++; continue;
     }
   }
-  if(c.length||r.length){push();newRow();}
+  if(c.length||r.length){ push(); newRow(); }
   return rows.filter(x=>x.length);
 }
 
-/* classify progress */
-function classify(v){
-  v=(v||"").trim();
-  if(!v) return "amber"; // blank = in progress
-  if(/^n$/i.test(v)) return "red";
-  return "green";
+/* ---- date helpers ---- */
+const pad=n=>n<10?("0"+n):(""+n);
+function serialToDMY(serial){
+  const base=new Date(Date.UTC(1899,11,30));
+  const t=base.getTime()+Number(serial)*86400000;
+  const d=new Date(t);
+  return `${pad(d.getUTCDate())} ${d.toLocaleString('en-GB',{month:'short'})} ${d.getUTCFullYear()}`;
+}
+function normDate(v){
+  const x=(v||"").toString().trim().replaceAll("-", "/");
+  if(!x || /^n\/?a?$/i.test(x)) return null;
+  if(/^\d+$/.test(x) && Number(x)>=30000 && Number(x)<=60000) return serialToDMY(x);
+  const m=x.match(/^(\d{1,2})[\/](\d{1,2})[\/](\d{2,4})$/);
+  if(m){
+    const y=(m[3].length===2?("20"+m[3]):m[3]);
+    const d=new Date(+y, +m[2]-1, +m[1]);
+    return `${pad(d.getDate())} ${d.toLocaleString('en-GB',{month:'short'})} ${d.getFullYear()}`;
+  }
+  return x; // leave as-is
 }
 
-/* build data model */
+/* ---- interprets a cell into Start/End + class ----
+   Supported:
+   - ""        -> amber (In Progress)
+   - "N"       -> red   (Not Started)
+   - "dd/mm/yyyy" or Excel serial -> treat as Completed (Start = End = date)
+   - "Start: X ... End: Y" -> uses both
+*/
+function interpretCell(raw){
+  const v=(raw||"").toString().trim();
+  if(!v) return {cls:"amber", start:"N/A", end:"N/A"};
+
+  if(/^n\/?a?$/i.test(v) || /^n$/i.test(v)) return {cls:"red", start:"N/A", end:"N/A"};
+
+  const m=v.match(/start\s*:\s*([^|<\n]+).*end\s*:\s*([^|<\n]+)/i);
+  if(m){
+    const s=normDate(m[1]); const e=normDate(m[2]);
+    if(s && e) return {cls:"green", start:s, end:e};
+    if(s && !e) return {cls:"amber", start:s, end:"N/A"};
+    return {cls:"red", start:"N/A", end:"N/A"};
+  }
+
+  // single value (assume a completion date)
+  const d=normDate(v);
+  if(d) return {cls:"green", start:d, end:d};
+
+  // fallback
+  return {cls:"amber", start:"N/A", end:"N/A"};
+}
+
+/* ---- build model from CSV (tasks down, students across) ----
+   Expect first row: ["Task Code","Topic", <Student1>, <Student2>, ...]
+   Then each subsequent row: [code, topic, valForStudent1, valForStudent2, ...]
+*/
 function buildModel(rows){
-  const headers=rows[0];
-  const students=rows.slice(1).map(r=>r[0]).filter(Boolean);
-  const topics=headers.slice(1).map(h=>{
-    const m=h.match(/^(.*?)\s*\((.*?)\)$/);
-    if(m) return {code:m[1].trim(),topic:m[2].trim()};
-    const parts=h.split(/\s*-\s*/);
-    return {code:parts[0].trim(),topic:parts[1]||""};
+  if(rows.length<2) return null;
+  const header=rows[0];
+  const students=header.slice(2).map(s=>s.trim()).filter(Boolean);
+
+  const tasks=rows.slice(1).filter(r=>r[0]||r[1]).map(r=>{
+    return {
+      code:(r[0]||"").toString().trim(),
+      topic:(r[1]||"").toString().trim(),
+      values:r.slice(2) // aligned with students
+    };
   });
-  const cells={};
-  rows.slice(1).forEach(r=>{
-    const name=r[0]; if(!name) return;
-    cells[name]=cells[name]||{};
-    r.slice(1).forEach((v,i)=>cells[name][i]=v);
-  });
-  return {students,topics,cells};
+
+  return {students, tasks};
 }
 
-/* auto-detect subjects and children */
-function groupTopics(topics){
-  const groups=[],map={};
-  let current=null;
-  topics.forEach((t,idx)=>{
-    const short=t.code.replace(/[^A-Za-z0-9]/g,"");
-    if(short.length<=3 && !/\d/.test(short)){ // treat as parent subject
-      current={title:t,cols:[]};
-      groups.push(current);
-    } else if(current){
-      current.cols.push({t,idx});
-    } else {
-      groups.push({title:t,cols:[{t,idx}]});
-    }
-  });
-  return groups;
-}
-
-/* render */
+/* ---- render to table (students left, topics across top) ---- */
 function render(model){
   const thead=document.getElementById("thead");
   const tbody=document.getElementById("tbody");
 
-  const groups=groupTopics(model.topics);
+  // Build top header row (Group 1 + topics)
+  const hCells = [`<th><span class="h-top">Group 1</span><span class="h-sub">&nbsp;</span></th>`]
+    .concat(model.tasks.map(t => {
+      const top = t.code || "";       // e.g., "H&S 1"
+      const sub = t.topic || "";      // e.g., "Identifying Hazards"
+      return `<th><span class="h-top">${top}</span><span class="h-sub">${sub}</span></th>`;
+    }));
+  thead.innerHTML = `<tr>${hCells.join("")}</tr>`;
 
-  // Parent subject header row
-  const parentRow=["<th>Group 1</th>"];
-  groups.forEach(g=>{
-    const span=g.cols.length||1;
-    parentRow.push(`<th colspan="${span}">${g.title.code} ${g.title.topic?`(${g.title.topic})`:""}</th>`);
-  });
-  thead.innerHTML=`<tr class="parent-row">${parentRow.join("")}</tr>`;
-
-  // Topic header row
-  const topicRow=["<th>Student</th>"];
-  groups.forEach(g=>{
-    g.cols.forEach(({t})=>{
-      topicRow.push(`<th><span class="h-top">${t.code}</span><span class="h-sub">${t.topic}</span></th>`);
+  // Body: one row per student (left), columns per task
+  tbody.innerHTML = "";
+  model.students.forEach((stu, sIdx)=>{
+    const rowCells = [`<td>${stu}</td>`];
+    model.tasks.forEach(task=>{
+      const raw = (task.values[sIdx] ?? "").toString();
+      const {cls,start,end} = interpretCell(raw);
+      rowCells.push(`
+        <td>
+          <div class="cell ${cls}">
+            <div class="row"><span class="lab">Start:</span><span class="val">${start}</span></div>
+            <div class="row" style="margin-top:6px;"><span class="lab">End:</span><span class="val">${end}</span></div>
+          </div>
+        </td>`);
     });
-  });
-  thead.insertAdjacentHTML("beforeend",`<tr class="topic-row">${topicRow.join("")}</tr>`);
-
-  // body
-  tbody.innerHTML="";
-  model.students.forEach(stu=>{
-    const tds=[`<td>${stu}</td>`];
-    groups.forEach(g=>{
-      g.cols.forEach(({idx})=>{
-        const raw=(model.cells[stu] && model.cells[stu][idx])||"";
-        const cls=classify(raw);
-        let inner="";
-        if(cls==="green") inner=`<div class="cell ${cls}">Completed: ${raw}</div>`;
-        else if(cls==="amber") inner=`<div class="cell ${cls}">In Progress</div>`;
-        else inner=`<div class="cell ${cls}">Not Started</div>`;
-        tds.push(`<td>${inner}</td>`);
-      });
-    });
-    tbody.insertAdjacentHTML("beforeend",`<tr>${tds.join("")}</tr>`);
+    tbody.insertAdjacentHTML("beforeend", `<tr>${rowCells.join("")}</tr>`);
   });
 }
 
+/* ---- load & refresh ---- */
 async function load(){
   const stamp=document.getElementById("stamp");
   try{
-    const res=await fetch(SHEET_URL+"&cb="+Date.now());
-    const txt=await res.text();
-    const rows=parseCSV(txt);
-    if(!rows.length){stamp.textContent="No data found.";return;}
+    const res=await fetch(CSV_URL + "&cb=" + Date.now());
+    const text=await res.text();
+    const rows=parseCSV(text);
     const model=buildModel(rows);
+    if(!model){ stamp.textContent="No data found"; return; }
     render(model);
-    stamp.textContent="Last updated: "+new Date().toLocaleTimeString();
-  }catch(e){
-    console.error(e);
-    stamp.textContent="Error loading data";
+    stamp.textContent="Last updated: " + new Date().toLocaleTimeString();
+  }catch(err){
+    console.error(err); stamp.textContent="Error loading data";
   }
 }
 load();
-setInterval(load,120000);
+setInterval(load, 120000);
 </script>
 </body>
 </html>
