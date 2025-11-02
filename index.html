@@ -1,102 +1,102 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Group 1 — Student Assessments</title>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Group 1 — Assessments Board</title>
 
-  <!-- Clean font -->
+  <!-- Clean UI font -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
 
   <style>
     :root{
-      --bg:#0f1822;          /* dark board */
-      --panel:#0b141d;
+      --bg:#0f1822;          /* dark background */
+      --panel:#0b1520;
       --firstcol:#cfd3d7;    /* wide grey first column */
       --head:#d9ecff;        /* light-blue headers */
-      --grid:#243140;
+      --grid:#223144;
 
-      --chip-r:#e53935;      /* red */
-      --chip-a:#f39c12;      /* amber */
-      --chip-g:#2ecc71;      /* green */
+      --red:#e74c3c;
+      --amber:#f39c12;
+      --green:#27ae60;
 
-      --chip-r-t:#ffffff;
-      --chip-a-t:#ffffff;
-      --chip-g-t:#ffffff;
+      --card-bg:#0c1722;
+      --card-alt:#0f1b27;
+      --text:#e9eef5;
     }
 
-    *{ box-sizing: border-box }
+    *{ box-sizing:border-box }
     html,body{ height:100% }
     body{
-      margin:0; font-family:Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-      background: var(--bg); color:#e9eef5;
+      margin:0;
+      font-family:Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background:var(--bg); color:var(--text);
     }
 
     header{
-      padding:14px 16px; text-align:center; font-weight:800; letter-spacing:.3px;
-      background:#0b1520; border-bottom:1px solid var(--grid);
+      text-align:center; font-weight:800; letter-spacing:.3px;
+      padding:14px 16px; background:#0b1520; border-bottom:1px solid var(--grid);
     }
 
-    .wrap{
-      max-width: 1600px; margin: 18px auto; padding: 0 16px;
-    }
+    .wrap{ max-width:1700px; margin:18px auto; padding:0 16px; }
 
     .board{
       border:1px solid var(--grid);
       background:#0b1520;
       border-radius:14px;
       overflow:auto;
-      box-shadow: 0 20px 60px rgba(0,0,0,.3);
+      box-shadow:0 20px 60px rgba(0,0,0,.35);
     }
 
-    table{ border-collapse: separate; border-spacing:0; width:max-content; min-width:100%; }
+    table{ border-collapse:separate; border-spacing:0; width:max-content; min-width:100%; }
 
-    /* header row (two lines inside each header cell) */
+    /* HEADER */
     thead th{
-      position: sticky; top: 0; z-index: 5;
-      background: var(--head); color:#0c1722;
-      border-right: 1px solid var(--grid);
-      border-bottom: 2px solid var(--grid);
-      padding: 8px 12px; text-align: center; min-width: 260px;
+      position:sticky; top:0; z-index:5;
+      background:var(--head); color:#0c1722;
+      border-right:1px solid var(--grid);
+      border-bottom:2px solid var(--grid);
+      padding:10px 12px; text-align:center; min-width:320px;
     }
     thead th:first-child{
-      min-width: 260px; background: var(--firstcol); left:0; position:sticky; z-index:6;
+      min-width:300px; background:var(--firstcol); left:0; position:sticky; z-index:6;
     }
-
-    .h-top{ display:block; font-weight:800; font-size:22px; line-height:1.2; }
+    .h-top{ display:block; font-weight:800; font-size:22px; line-height:1.25; }
     .h-sub{ display:block; font-weight:700; font-size:16px; opacity:.9; margin-top:4px; }
 
-    /* sticky first column for names */
-    tbody td:first-child, thead th:first-child{
-      position: sticky; left: 0;
-      background: var(--firstcol); color:#0b0f13; text-align:center; font-weight:800;
-      border-right:1px solid var(--grid);
-    }
-
+    /* BODY */
     tbody td{
       border-right:1px solid var(--grid);
       border-bottom:1px solid var(--grid);
-      padding: 16px; text-align:center; background:#0f1b27;
+      padding:18px; text-align:center; background:var(--card-bg);
+    }
+    tbody tr:nth-child(even) td{ background:var(--card-alt); }
+
+    /* sticky first column for student names */
+    tbody td:first-child, thead th:first-child{
+      position:sticky; left:0;
+      background:var(--firstcol); color:#0b0f13;
+      font-weight:800; text-align:center;
+      border-right:1px solid var(--grid);
     }
 
-    tbody tr:nth-child(even) td{ background:#0e1a25; }
-
+    /* coloured block */
     .cell{
-      margin:auto; width: 92%; max-width: 380px;
-      border-radius: 18px; padding: 16px 18px;
-      color: #fff; box-shadow: inset 0 0 0 2px rgba(255,255,255,.08);
+      margin:auto; width:92%; max-width:420px;
+      border-radius:22px; padding:18px 20px;
+      color:#fff; box-shadow: inset 0 0 0 2px rgba(255,255,255,.08);
     }
-    .cell.red   { background: var(--chip-r); color: var(--chip-r-t); }
-    .cell.amber { background: var(--chip-a); color: var(--chip-a-t); }
-    .cell.green { background: var(--chip-g); color: var(--chip-g-t); }
+    .red{   background:var(--red); }
+    .amber{ background:var(--amber); }
+    .green{ background:var(--green); }
 
-    .lab{ font-weight:800; margin-right:6px; }
-    .row{ display:flex; justify-content:center; gap:12px; }
+    .row{ display:flex; justify-content:center; gap:10px; }
+    .lab{ font-weight:800; }
     .kv{ font-weight:700; }
 
-    .stamp{ text-align:right; color:#8ea4bd; font-size:12px; padding:10px 6px; }
+    .stamp{ text-align:right; color:#90a4bf; font-size:12px; padding:10px 6px; }
   </style>
 </head>
 <body>
@@ -113,13 +113,13 @@
   </div>
 
   <script>
-    // 👉 Your live Tracking sheet CSV (published)
-    const sheetUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRTW5UzVfnAcBJdW9fSL7SXFc0wtUV5ftFWKaFExTPhq7FTv5QZ0rHqjs4sLlBnFHzCi0ThHMzV3rT_/pub?gid=1926586971&single=true&output=csv";
+    // 👉 Your live Tracking sheet CSV (tall/long format)
+    const sheetUrl =
+      "https://docs.google.com/spreadsheets/d/e/2PACX-1vRTW5UzVfnAcBJdW9fSL7SXFc0wtUV5ftFWKaFExTPhq7FTv5QZ0rHqjs4sLlBnFHzCi0ThHMzV3rT_/pub?gid=1926586971&single=true&output=csv";
 
-    // --- CSV parser (handles quotes) ---
+    /* ---------- CSV + date helpers ---------- */
     function parseCSV(text){
-      const out = [], row = [];
-      let i=0, cell="", q=false;
+      const out=[], row=[]; let i=0, cell="", q=false;
       const push=()=>{ row.push(cell); cell=""; };
       const newRow=()=>{ out.push(row.slice()); row.length=0; };
       while(i<text.length){
@@ -140,89 +140,111 @@
       return out.filter(r=>r.length);
     }
 
-    // Dates: accept dd/mm/yyyy or Excel serials, or "N/A"
-    const pad = n => n<10 ? "0"+n : ""+n;
-    function serialToDate(s){
-      const base = new Date(Date.UTC(1899,11,30));
-      const t = base.getTime() + Number(s)*86400000;
-      const d = new Date(t);
+    const pad=n=>n<10?"0"+n:""+n;
+    function serialToDMY(serial){
+      const base=new Date(Date.UTC(1899,11,30));
+      const t=base.getTime()+Number(serial)*86400000;
+      const d=new Date(t);
       return `${pad(d.getUTCDate())} ${d.toLocaleString('en-GB',{month:'short'})} ${d.getUTCFullYear()}`;
     }
     function normaliseDate(v){
-      const x = (v||"").toString().trim().replaceAll("//","/").replaceAll("-","/");
-      if(!x || /^n\/?a$/i.test(x) || /^n$/i.test(x)) return "N/A";
-      if(/^\d+$/.test(x) && Number(x)>=30000 && Number(x)<=60000) return serialToDate(x);
-      // dd/mm/yyyy
-      const m = x.match(/^(\d{1,2})[\/](\d{1,2})[\/](\d{4})$/);
-      if(m){
-        const d = new Date(+m[3], +m[2]-1, +m[1]);
-        return `${pad(d.getDate())} ${d.toLocaleString('en-GB',{month:'short'})} ${d.getFullYear()}`;
-      }
-      return x; // leave text
+      const x=(v||"").toString().trim().replaceAll("//","/").replaceAll("-","/");
+      if(!x || /^n\/?a$/i.test(x) || /^n$/i.test(x)) return null;
+      if(/^\d+$/.test(x) && Number(x)>=30000 && Number(x)<=60000) return serialToDMY(x);
+      const m=x.match(/^(\d{1,2})[\/](\d{1,2})[\/](\d{4})$/);
+      if(m){ const d=new Date(+m[3],+m[2]-1,+m[1]); return `${pad(d.getDate())} ${d.toLocaleString('en-GB',{month:'short'})} ${d.getFullYear()}`; }
+      return x; // leave text as-is
     }
 
-    // Build the board from a "wide" sheet with Start/End pairs
-    function buildBoard(rows){
-      if(rows.length < 3) return;
-      const head1 = rows[0];      // e.g., "Student", "H&S 1 Start", "H&S 1 End", ...
-      const head2 = rows[1];      // e.g., "", "Identifying Hazards", "Identifying Hazards", ...
+    /* ---------- Transform tall sheet -> board model ---------- */
+    // Expect headers: "Date / Status" | "Task Code" | "Topic" | "Student"
+    function buildModel(rows){
+      if(rows.length<2) return {students:[], topics:[], map:{}};
 
-      // Find Start/End pairs per assessment
-      const pairs = []; // [{key:'H&S 1', topic:'Identifying Hazards', startCol:1, endCol:2}, ...]
-      for(let c=1; c<head1.length; c++){
-        const h = (head1[c]||"").trim();
-        if(/start$/i.test(h)){
-          const base = h.replace(/\s*start$/i,"").trim();
-          const endIdx = c+1;
-          const endHeader = (head1[endIdx]||"").trim();
-          if(new RegExp(`^${base}\\s*end$`,"i").test(endHeader)){
-            const topic = (head2[c] || head2[endIdx] || "").trim();
-            pairs.push({ key: base, topic, startCol:c, endCol:endIdx });
-            c = endIdx; // skip the next one (paired)
-          }
-        }
+      const header = rows[0].map(h=>h.trim().toLowerCase());
+      const cDate = header.indexOf("date / status");
+      const cCode = header.indexOf("task code");
+      const cTopic = header.indexOf("topic");
+      const cStud = header.indexOf("student");
+      if(cDate<0 || cCode<0 || cTopic<0 || cStud<0){
+        console.warn("Header columns not found. Expected: Date / Status | Task Code | Topic | Student");
       }
 
-      // Render thead: first col (names) + one col per assessment (with two-line header)
+      const studentsSet = new Set();
+      const topicOrder = [];              // keep first-seen order
+      const topicSeen  = new Set();
+      const buckets = {};                 // buckets[student][topicKey] = array of dates
+
+      for(let r=1; r<rows.length; r++){
+        const row = rows[r];
+        const rawDate  = row[cDate]  ?? "";
+        const code     = (row[cCode]  ?? "").trim();
+        const topic    = (row[cTopic] ?? "").trim();
+        const student  = (row[cStud]  ?? "").trim();
+        if(!student || !code) continue;
+
+        studentsSet.add(student);
+
+        const topicKey = `${code}|||${topic}`; // stable key
+        if(!topicSeen.has(topicKey)){
+          topicSeen.add(topicKey);
+          topicOrder.push({ key: topicKey, code, topic });
+        }
+
+        const nDate = normaliseDate(rawDate); // null if N/A/blank
+        if(!buckets[student]) buckets[student]={};
+        if(!buckets[student][topicKey]) buckets[student][topicKey]=[];
+        if(nDate) buckets[student][topicKey].push(nDate);
+      }
+
+      const students = Array.from(studentsSet);
+      students.sort((a,b)=>a.localeCompare(b)); // alphabetical names
+
+      return { students, topics: topicOrder, data: buckets };
+    }
+
+    function decideCell(dates){
+      // dates = [] | [date] | [d1,d2,...]
+      if(!dates || dates.length===0) return {cls:"red",   start:"N/A", end:"N/A"};
+      if(dates.length===1)           return {cls:"amber", start:dates[0], end:"N/A"};
+      // pick min as start, max as end (string dates are in "DD Mon YYYY" so sort via Date)
+      const sorted = dates.slice().sort((a,b)=> new Date(a) - new Date(b));
+      return {cls:"green", start:sorted[0], end:sorted[sorted.length-1]};
+    }
+
+    /* ---------- Render ---------- */
+    function renderBoard(model){
       const thead = document.getElementById("thead");
       const tbody = document.getElementById("tbody");
-      thead.innerHTML = "";
+
+      // build header row: first cell "Group 1", then each topic column (two-line)
+      const headCells = [
+        `<th><span class="h-top">Group 1</span><span class="h-sub">&nbsp;</span></th>`
+      ].concat(
+        model.topics.map(t =>
+          `<th><span class="h-top">${t.code}</span><span class="h-sub">${t.topic}</span></th>`
+        )
+      ).join("");
+      thead.innerHTML = `<tr>${headCells}</tr>`;
+
+      // body rows: one per student
       tbody.innerHTML = "";
-
-      const hCells = [`<th><span class="h-top">Group 1</span><span class="h-sub">&nbsp;</span></th>`]
-        .concat(pairs.map(p => `<th><span class="h-top">${p.key}</span><span class="h-sub">${p.topic||""}</span></th>`))
-        .join("");
-      thead.innerHTML = `<tr>${hCells}</tr>`;
-
-      // Body rows (students)
-      for(let r=2; r<rows.length; r++){
-        const name = (rows[r][0]||"").trim();
-        if(!name) continue;
-
-        const tds = [`<td>${name}</td>`];
-
-        pairs.forEach(p=>{
-          const sRaw = rows[r][p.startCol] || "";
-          const eRaw = rows[r][p.endCol]   || "";
-          const s = normaliseDate(sRaw);
-          const e = normaliseDate(eRaw);
-
-          let cls = "red";
-          if(s!=="N/A" && e==="N/A") cls = "amber";
-          if(s!=="N/A" && e!=="N/A") cls = "green";
-
+      model.students.forEach(student => {
+        const tds = [`<td>${student}</td>`];
+        model.topics.forEach(t => {
+          const dates = (model.data[student] && model.data[student][t.key]) || [];
+          const d = decideCell(dates);
           tds.push(
             `<td>
-               <div class="cell ${cls}">
-                 <div class="row"><span class="lab">Start:</span> <span class="kv">${s}</span></div>
-                 <div class="row" style="margin-top:6px;"><span class="lab">End:</span> <span class="kv">${e}</span></div>
-               </div>
-             </td>`
+              <div class="cell ${d.cls}">
+                <div class="row"><span class="lab">Start:</span><span class="kv">${d.start}</span></div>
+                <div class="row" style="margin-top:6px;"><span class="lab">End:</span><span class="kv">${d.end}</span></div>
+              </div>
+            </td>`
           );
         });
-
         tbody.insertAdjacentHTML("beforeend", `<tr>${tds.join("")}</tr>`);
-      }
+      });
     }
 
     async function load(){
@@ -231,12 +253,13 @@
         const res = await fetch(sheetUrl + "&cb=" + Date.now()); // cache-bust
         const text = await res.text();
         const rows = parseCSV(text);
-        buildBoard(rows);
+        const model = buildModel(rows);
+        renderBoard(model);
         const now = new Date();
-        stamp.textContent = `Last updated: ${now.toLocaleTimeString()}`;
+        stamp.textContent = "Last updated: " + now.toLocaleTimeString();
       }catch(e){
         console.error(e);
-        stamp.textContent = "Error loading data. Check the published CSV link.";
+        stamp.textContent = "Error loading data (check CSV link)";
       }
     }
 
