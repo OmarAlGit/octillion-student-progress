@@ -12,7 +12,6 @@
   --header: #d4e6fa;
   --grid: #2b323a;
   --green: #42b972;
-  --amber: #e39d2b;
   --red: #d15b4a;
 }
 
@@ -36,19 +35,18 @@ h1 {
   background: var(--panel);
   border-radius: 14px;
   overflow-x: auto;
-  overflow-y: visible;
   box-shadow: 0 20px 60px rgba(0,0,0,.35);
 }
 
 table {
   border-collapse: collapse;
   width: 100%;
-  min-width: 1200px;
+  min-width: 1100px;
 }
 
 th, td {
   border: 1px solid var(--grid);
-  padding: 0.5rem;
+  padding: 0.6rem;
   text-align: center;
 }
 
@@ -75,9 +73,8 @@ tbody td:first-child {
   left: 0;
   z-index: 4;
   vertical-align: middle;
-  min-width: 240px;
-  height: 110px;
-  white-space: normal;
+  min-width: 220px;
+  height: 90px;
   line-height: 1.3;
   font-size: 18px;
   border-right: 1px solid var(--grid);
@@ -96,7 +93,6 @@ tbody td:first-child {
 }
 
 .green { background: var(--green); }
-.amber { background: var(--amber); }
 .red { background: var(--red); }
 
 .legend {
@@ -117,7 +113,6 @@ tbody td:first-child {
   border-radius: 50%;
 }
 .legend .green { background: var(--green); }
-.legend .amber { background: var(--amber); }
 .legend .red { background: var(--red); }
 </style>
 </head>
@@ -131,38 +126,55 @@ tbody td:first-child {
   </div>
   <div class="legend">
     <span><div class="dot green"></div> Completed</span>
-    <span><div class="dot amber"></div> In Progress</span>
-    <span><div class="dot red"></div> Not Started</span>
+    <span><div class="dot red"></div> Not Completed</span>
   </div>
 
 <script>
-// ✅ Google Sheet CSV
+// ✅ Google Sheet CSV (Tracking Sheet)
 const sheetUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRTW5UzVfnAcBJdW9fSL7SXFc0wtUV5ftFWKaFExTPhq7FTv5QZ0rHqjs4sLlBnFHzCi0ThHMzV3rT_/pub?gid=1926586971&single=true&output=csv";
 
 async function loadData() {
   const res = await fetch(sheetUrl);
   const text = await res.text();
   const rows = text.trim().split("\n").map(r => r.split(","));
-  
+
+  // Headers
   const headerRow = ["Group 1", "H&S", "H&S 1", "H&S 2", "H&S 3", "H&S 4", "H&S 5", "H&S 6", "H&S 7"];
   const subheaders = ["", "Health & Safety Practices", "Identifying Hazards", "Manual Handling", "Manual Handling using lifting aids", "Ladders", "Standsteps", "Scaffold", "Safety Signs"];
-  const students = ["Sadegh Zohrabbagi","Umar Majid","Saeed Fathi","Siavash Fathi","Ali Yaghout","Alex Abdulahad","Jibrill Mohamud","Ali Mohamed","Nigel Maraj","Nicolas Lennox"];
-  
-  // Table headers
+
+  // Auto-detected student list (from sheet)
+  const students = Array.from(new Set(rows.map(r => r[4]).filter(x => x && x !== "Name" && !x.match(/Totals/i))));
+
+  // Map of task -> student -> status
+  const taskMap = {};
+  rows.forEach(r => {
+    const date = r[0]?.trim();
+    const task = (r[1]?.trim() || "") + " " + (r[2]?.trim() || "");
+    const student = r[4]?.trim();
+    if (!student || student === "Name") return;
+    if (!taskMap[task]) taskMap[task] = {};
+    taskMap[task][student] = date;
+  });
+
+  // Table header
   const thead = document.getElementById("tableHead");
   thead.innerHTML = `
     <tr>${headerRow.map((h, i) => `<th>${h}${subheaders[i] ? `<small>${subheaders[i]}</small>` : ""}</th>`).join("")}</tr>
   `;
-  
+
+  // Table body
   const tbody = document.getElementById("tableBody");
-  tbody.innerHTML = students.map(name => `
+  tbody.innerHTML = students.map(student => `
     <tr>
-      <td>${name}</td>
-      ${headerRow.slice(1).map(() => {
-        const status = Math.random(); // Mock for now
-        if (status > 0.7) return `<td><div class="status green">Start: 06 Aug 2025<br>End: 11 Aug 2025</div></td>`;
-        if (status > 0.4) return `<td><div class="status amber">Start: 07 Aug 2025<br>End: N/A</div></td>`;
-        return `<td><div class="status red">Start: N/A<br>End: N/A</div></td>`;
+      <td>${student}</td>
+      ${headerRow.slice(1).map((h, i) => {
+        const topic = h + " " + (subheaders[i+1] || "");
+        const status = taskMap[topic]?.[student];
+        if (!status || status === "N" || status === "") {
+          return `<td><div class="status red">Not Completed</div></td>`;
+        } else {
+          return `<td><div class="status green">Completed:<br>${status}</div></td>`;
+        }
       }).join("")}
     </tr>
   `).join("");
