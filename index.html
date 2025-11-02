@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
 <title>Group 1 — Student Assessments</title>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -11,138 +11,197 @@
 
 <style>
 :root{
-  --bg:#0f1822;
-  --panel:#0b1520;
-  --firstcol:#cfd3d7;
-  --head:#d9ecff;
-  --grid:#223144;
-  --red:#e74c3c;
-  --amber:#f39c12;
-  --green:#27ae60;
+  --bg:#0f1822; --panel:#0b1520; --firstcol:#cfd3d7; --head:#d9ecff; --grid:#223144;
+  --red:#e74c3c; --amber:#f39c12; --green:#27ae60; --muted:#90a4bf;
 }
 *{box-sizing:border-box}
-body{
-  margin:0;background:var(--bg);color:#fff;
-  font-family:"Inter",system-ui,Arial,sans-serif;
-}
-header{background:#0b1520;text-align:center;
-  font-weight:800;padding:14px;border-bottom:1px solid var(--grid);}
-.wrap{max-width:1700px;margin:18px auto;padding:0 16px;}
-.board{border:1px solid var(--grid);background:var(--panel);
-  border-radius:14px;overflow:auto;
-  box-shadow:0 20px 60px rgba(0,0,0,.35);}
-table{border-collapse:separate;border-spacing:0;width:max-content;min-width:100%;}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:#fff;font-family:"Inter",system-ui,Arial,sans-serif}
+header{background:#0b1520;text-align:center;font-weight:800;padding:14px;border-bottom:1px solid var(--grid)}
+.wrap{max-width:1700px;margin:18px auto;padding:0 16px}
+.board{border:1px solid var(--grid);background:var(--panel);border-radius:14px;overflow:auto;box-shadow:0 20px 60px rgba(0,0,0,.35)}
+table{border-collapse:separate;border-spacing:0;width:max-content;min-width:100%}
+
+/* header */
 thead th{
-  background:var(--head);color:#0c1722;
+  position:sticky;top:0;z-index:5;background:var(--head);color:#0c1722;
   border-right:1px solid var(--grid);border-bottom:2px solid var(--grid);
-  padding:12px;text-align:center;min-width:250px;}
+  padding:12px;text-align:center;min-width:260px}
 thead th:first-child{
-  background:var(--firstcol);position:sticky;left:0;z-index:6;min-width:260px;}
-tbody td{
-  border-right:1px solid var(--grid);border-bottom:1px solid var(--grid);
-  text-align:center;padding:16px;}
-tbody td:first-child{
-  background:var(--firstcol);color:#0b0f13;
-  font-weight:800;position:sticky;left:0;z-index:5;}
-.cell{
-  margin:auto;width:90%;max-width:360px;border-radius:20px;
-  padding:14px 10px;color:#fff;font-weight:700;}
-.red{background:var(--red);}
-.amber{background:var(--amber);}
-.green{background:var(--green);}
-.lab{font-weight:800;}
-.stamp{text-align:right;color:#90a4bf;font-size:12px;padding:10px 6px;}
+  background:var(--firstcol);position:sticky;left:0;z-index:6;min-width:260px}
+.h-top{display:block;font-weight:800;font-size:22px;line-height:1.2}
+.h-sub{display:block;font-weight:700;font-size:16px;opacity:.9;margin-top:4px}
+
+/* body */
+tbody td{border-right:1px solid var(--grid);border-bottom:1px solid var(--grid);text-align:center;padding:18px;background:#0f1b27}
+tbody tr:nth-child(even) td{background:#0e1a25}
+tbody td:first-child{background:var(--firstcol);color:#0b0f13;font-weight:800;position:sticky;left:0;z-index:4}
+
+/* coloured blocks */
+.cell{margin:auto;width:92%;max-width:420px;border-radius:22px;padding:18px 20px;color:#fff;
+      box-shadow:inset 0 0 0 2px rgba(255,255,255,.08)}
+.red{background:var(--red)} .amber{background:var(--amber)} .green{background:var(--green)}
+.label{font-weight:800}
+
+/* legend */
+.legend{display:flex;gap:12px;align-items:center;justify-content:flex-end;color:var(--muted);font-size:12px;padding:10px 6px}
+.legend .dot{display:inline-block;width:12px;height:12px;border-radius:50%}
+.dot.red{background:var(--red)} .dot.amber{background:var(--amber)} .dot.green{background:var(--green)}
+.stamp{margin-left:auto}
 </style>
 </head>
-
 <body>
 <header>Group 1 — Student Assessments</header>
+
 <div class="wrap">
   <div class="board">
     <table id="grid"><thead id="thead"></thead><tbody id="tbody"></tbody></table>
   </div>
-  <div class="stamp" id="stamp">Loading…</div>
+  <div class="legend">
+    <span><span class="dot green"></span> Completed</span>
+    <span><span class="dot amber"></span> In Progress</span>
+    <span><span class="dot red"></span> Not Started</span>
+    <span class="stamp" id="stamp">Loading…</span>
+  </div>
 </div>
 
 <script>
-const sheetUrl =
+const SHEET_URL =
  "https://docs.google.com/spreadsheets/d/e/2PACX-1vRTW5UzVfnAcBJdW9fSL7SXFc0wtUV5ftFWKaFExTPhq7FTv5QZ0rHqjs4sLlBnFHzCi0ThHMzV3rT_/pub?gid=1926586971&single=true&output=csv";
 
+/* --- CSV parser --- */
 function parseCSV(t){
-  const rows=[],r=[];let i=0,c="",q=false;
-  const push=()=>{r.push(c);c="";};
-  const newRow=()=>{rows.push(r.slice());r.length=0;};
+  const rows=[], r=[]; let i=0, c="", q=false;
+  const push=()=>{ r.push(c); c=""; };
+  const newRow=()=>{ rows.push(r.slice()); r.length=0; };
   while(i<t.length){
-    const ch=t[i],n=t[i+1];
+    const ch=t[i], n=t[i+1];
     if(q){
-      if(ch=='"'&&n=='"'){c+='"';i+=2;continue;}
-      if(ch=='"'){q=false;i++;continue;}
-      c+=ch;i++;continue;
+      if(ch=='"'&&n=='"'){ c+='"'; i+=2; continue; }
+      if(ch=='"'){ q=false; i++; continue; }
+      c+=ch; i++; continue;
     }else{
-      if(ch=='"'){q=true;i++;continue;}
-      if(ch==','){push();i++;continue;}
-      if(ch=='\r'){i++;continue;}
-      if(ch=='\n'){push();newRow();i++;continue;}
-      c+=ch;i++;continue;
+      if(ch=='"'){ q=true; i++; continue; }
+      if(ch==','){ push(); i++; continue; }
+      if(ch=='\r'){ i++; continue; }
+      if(ch=='\n'){ push(); newRow(); i++; continue; }
+      c+=ch; i++; continue;
     }
   }
-  if(c.length||r.length){push();newRow();}
+  if(c.length||r.length){ push(); newRow(); }
   return rows.filter(x=>x.length);
 }
 
-function decideClass(v){
-  v=(v||"").trim();
-  if(!v) return "amber";          // blank -> amber
-  if(/^n$/i.test(v)) return "red";// N or n -> red
-  return "green";                 // date or text -> green
+/* --- helpers --- */
+function classify(val){
+  const v=(val||"").toString().trim();
+  if(!v) return "amber";           // blank = in progress
+  if(/^n$/i.test(v)) return "red"; // N = not started
+  return "green";                  // any date/text = completed
+}
+function headerSplit(colHeader){
+  // "H&S 1 (Identifying Hazards)" -> ["H&S 1", "Identifying Hazards"]
+  const m = (colHeader||"").match(/^(.*?)\s*\((.*?)\)\s*$/);
+  if(m) return [m[1].trim(), m[2].trim()];
+  return [colHeader||"", ""];
 }
 
-function formatCell(v,cls){
-  if(cls==="green") return `<div class="cell ${cls}"><div class="lab">Completed:</div>${v}</div>`;
-  if(cls==="amber") return `<div class="cell ${cls}"><div class="lab">In Progress</div></div>`;
-  return `<div class="cell ${cls}"><div class="lab">Not Started</div></div>`;
+/* --- Orientation detection & model build --- */
+function buildModel(rows){
+  // Two supported orientations:
+  // A) Students in first column, topics in header row (H&S 1 (Topic))
+  // B) Students across the top (row 0), topics down the left (col0=code, col1=topic)
+  const headers = rows[0];
+
+  // Heuristic: if row0 contains "Name" or many person-like cells and col0/col1 of rows look like "H&S x"
+  const likelyTransposed = /name/i.test(headers[1] || headers[2] || "") ||
+                           rows.slice(1,6).some(r => /^h&?s/i.test((r[0]||"").trim()));
+
+  if(!likelyTransposed){
+    // --- Orientation A: Student in col0, topics in header ---
+    const students = rows.slice(1).map(r => r[0]).filter(Boolean);
+    const topics = headers.slice(1).map(h => {
+      const [code,topic] = headerSplit(h);
+      return { code, topic };
+    });
+    const cells = {}; // cells[student][topicIndex] = value
+    rows.slice(1).forEach(r=>{
+      const name=r[0]; if(!name) return;
+      cells[name]=cells[name]||{};
+      r.slice(1).forEach((v,i)=>{ cells[name][i]=v; });
+    });
+    return {mode:"rowStudents", students, topics, cells};
+  } else {
+    // --- Orientation B: Students on top, topics down the left (code + topic columns), values start at col2 ---
+    const students = headers.slice(2).filter(Boolean);
+    // build topics from each subsequent row
+    const topics = [];
+    const valuesByTopic = []; // array of arrays: for each topic row, values per student
+    rows.slice(1).forEach(r=>{
+      const code=(r[0]||"").trim();
+      const topic=(r[1]||"").trim();
+      if(!code) return;
+      topics.push({code, topic});
+      valuesByTopic.push(r.slice(2));
+    });
+    // convert to cells[student][topicIndex]
+    const cells = {};
+    students.forEach((stu, sIdx)=>{
+      cells[stu] = {};
+      valuesByTopic.forEach((rowVals, tIdx)=>{
+        cells[stu][tIdx] = rowVals[sIdx] || "";
+      });
+    });
+    return {mode:"colStudents", students, topics, cells};
+  }
+}
+
+/* --- render --- */
+function render(model){
+  const thead=document.getElementById("thead");
+  const tbody=document.getElementById("tbody");
+
+  // header row
+  const h = [`<th><span class="h-top">Group 1</span><span class="h-sub">&nbsp;</span></th>`]
+    .concat(model.topics.map(t =>
+      `<th><span class="h-top">${t.code}</span><span class="h-sub">${t.topic}</span></th>`
+    )).join("");
+  thead.innerHTML = `<tr>${h}</tr>`;
+
+  // body rows: students down the left
+  tbody.innerHTML = "";
+  model.students.forEach(stu=>{
+    const tds = [`<td>${stu}</td>`];
+    model.topics.forEach((_, tIdx)=>{
+      const raw = (model.cells[stu] && model.cells[stu][tIdx]) || "";
+      const cls = classify(raw);
+      let inner = "";
+      if (cls==="green") inner = `<div class="cell ${cls}"><div class="label">Completed:</div> ${raw}</div>`;
+      else if (cls==="amber") inner = `<div class="cell ${cls}"><div class="label">In Progress</div></div>`;
+      else inner = `<div class="cell ${cls}"><div class="label">Not Started</div></div>`;
+      tds.push(`<td>${inner}</td>`);
+    });
+    tbody.insertAdjacentHTML("beforeend", `<tr>${tds.join("")}</tr>`);
+  });
 }
 
 async function load(){
   const stamp=document.getElementById("stamp");
   try{
-    const res=await fetch(sheetUrl+"&cb="+Date.now());
+    const res=await fetch(SHEET_URL+"&cb="+Date.now());
     const txt=await res.text();
     const rows=parseCSV(txt);
-    if(rows.length<2){stamp.textContent="No data.";return;}
-    const headers=rows[0];
-    const body=rows.slice(1);
-    const thead=document.getElementById("thead");
-    const tbody=document.getElementById("tbody");
-
-    // header
-    const headHTML=["<th>Group 1</th>"]
-      .concat(headers.slice(1).map(h=>{
-        const m=h.match(/^(.*?)\s*\((.*?)\)$/);
-        const top=m?m[1]:h, sub=m?m[2]:"";
-        return `<th><span class="lab">${top}</span><br><span>${sub}</span></th>`;
-      })).join("");
-    thead.innerHTML=`<tr>${headHTML}</tr>`;
-
-    // rows
-    tbody.innerHTML="";
-    body.forEach(r=>{
-      if(!r[0]) return;
-      const name=r[0];
-      const cells=r.slice(1).map(v=>{
-        const cls=decideClass(v);
-        return `<td>${formatCell(v,cls)}</td>`;
-      }).join("");
-      tbody.insertAdjacentHTML("beforeend",`<tr><td>${name}</td>${cells}</tr>`);
-    });
-
+    if(!rows.length){ stamp.textContent="No data found."; return; }
+    const model = buildModel(rows);
+    render(model);
     stamp.textContent="Last updated: "+new Date().toLocaleTimeString();
   }catch(e){
     console.error(e);
     stamp.textContent="Error loading data";
   }
 }
-load(); setInterval(load,120000);
+load();
+setInterval(load, 120000);
 </script>
 </body>
 </html>
