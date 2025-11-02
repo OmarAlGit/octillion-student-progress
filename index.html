@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Student Progress – Tracking Grid</title>
+
+  <!-- Inter font (cleaner than default) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      /* Keep your blue family; tweak if needed */
+      --brand:#1976d2;
+      --brand-deep:#1565c0;
+      --bg:#f5f7fb;
+      --card:#ffffff;
+      --text:#111827;
+      --muted:#6b7280;
+      --sep:#e6e9ef;
+      --row:#f9fbff;
+      --chip-ok-bg:#e8f5e9;
+      --chip-ok-tx:#2e7d32;
+      --chip-no-bg:#fdecea;
+      --chip-no-tx:#c62828;
+      --sticky-bg:#eef3ff;
+    }
+
+    *{ box-sizing:border-box }
+    html,body{ height:100% }
+    body{
+      margin:0;
+      font-family:Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background:linear-gradient(135deg,#f7f9ff,#eef3ff);
+      color:var(--text);
+    }
+
+    header{
+      position:sticky; top:0; z-index:10;
+      background:linear-gradient(90deg,var(--brand),var(--brand-deep));
+      color:#fff; text-align:center; padding:14px 10px;
+      font-weight:700; letter-spacing:.2px;
+      box-shadow:0 6px 20px rgba(21,101,192,.18);
+    }
+
+    main{ max-width:1600px; margin:28px auto; padding:0 18px; }
+
+    .frame{
+      background:var(--card);
+      border:1px solid var(--sep);
+      border-radius:16px;
+      box-shadow:0 20px 50px rgba(25,118,210,.08);
+      overflow:hidden;
+    }
+
+    .toolbar{
+      display:flex; align-items:center; justify-content:space-between;
+      padding:14px 16px; gap:12px; border-bottom:1px solid var(--sep);
+      background:linear-gradient(180deg,#fff, #fafcff);
+    }
+    .title{ font-weight:700; color:var(--brand); }
+    .hint{ color:var(--muted); font-size:12px; }
+
+    .scroller{
+      overflow:auto; /* horizontal scroll on small screens */
+    }
+
+    /* Modern table look (no harsh gridlines) */
+    table{
+      border-collapse:separate; border-spacing:0;
+      width:max-content; min-width:100%;
+      font-size:14px; line-height:1.35;
+    }
+
+    thead th{
+      position:sticky; top:0; z-index:3;
+      background:linear-gradient(180deg,var(--brand),var(--brand-deep));
+      color:#fff; font-weight:600; padding:10px 12px;
+      text-align:center; white-space:nowrap;
+      border-bottom:1px solid rgba(255,255,255,.25);
+    }
+
+    tbody td{
+      padding:10px 12px; white-space:nowrap; text-align:center;
+      border-bottom:1px dashed var(--sep);
+    }
+    tbody tr:nth-child(even) td{ background:var(--row); }
+
+    /* Sticky first two columns (Task Code + Topic/Description) */
+    .sticky-1{ position:sticky; left:0; z-index:2; text-align:left; background:var(--sticky-bg); font-weight:600; }
+    .sticky-2{ position:sticky; left:200px; z-index:2; text-align:left; background:var(--sticky-bg); }
+    /* Make header cells sticky with same offsets */
+    thead th.sticky-1{ left:0; z-index:4; }
+    thead th.sticky-2{ left:200px; z-index:4; }
+
+    /* Suggested widths: adjust to taste */
+    .col-code{ min-width:200px; }
+    .col-topic{ min-width:360px; }
+    .col-student{ min-width:140px; }
+
+    /* Modern chips for statuses */
+    .chip{
+      display:inline-flex; align-items:center; gap:8px;
+      padding:6px 10px; border-radius:999px; font-weight:600;
+      border:1px solid transparent;
+    }
+    .chip.ok{ background:var(--chip-ok-bg); color:var(--chip-ok-tx); border-color:#cde8d1; }
+    .chip.no{ background:var(--chip-no-bg); color:var(--chip-no-tx); border-color:#f9c6bf; }
+    .chip.muted{ color:var(--muted); background:#f2f4f8; border-color:#e5e7eb; }
+
+    .footer{
+      display:flex; justify-content:flex-end; gap:10px; align-items:center;
+      padding:10px 14px; color:var(--muted); font-size:12px;
+      border-top:1px solid var(--sep); background:#fbfcff;
+    }
+
+    @media (max-width: 900px){
+      .sticky-2, thead th.sticky-2{ left:170px; }
+      .col-code{ min-width:170px; }
+      .col-topic{ min-width:300px; }
+    }
+  </style>
+</head>
+<body>
+  <header>📊 Student Progress – Tracking Grid</header>
+
+  <main>
+    <div class="frame">
+      <div class="toolbar">
+        <div class="title">Live Tracking (modernised style)</div>
+        <div class="hint" id="updated">Loading…</div>
+      </div>
+
+      <div class="scroller">
+        <table id="grid">
+          <thead></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+
+      <div class="footer">
+        <span>✅ Any value or date = Completed</span>
+        <span>❌ N or blank = Not done</span>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    // Use your Tracking Sheet CSV (direct tab):
+    const sheetUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRTW5UzVfnAcBJdW9fSL7SXFc0wtUV5ftFWKaFExTPhq7FTv5QZ0rHqjs4sLlBnFHzCi0ThHMzV3rT_/pub?gid=1926586971&single=true&output=csv";
+
+    const grid = document.getElementById("grid");
+    const thead = grid.querySelector("thead");
+    const tbody = grid.querySelector("tbody");
+    const updated = document.getElementById("updated");
+
+    /* Robust CSV parser (handles quotes/commas/newlines) */
+    function parseCSV(text){
+      const rows = [];
+      let row = [], i=0, cur="", inQ=false;
+      while(i<text.length){
+        const ch = text[i], nx=text[i+1];
+        if(inQ){
+          if(ch === '"' && nx === '"'){ cur += '"'; i+=2; continue; }
+          if(ch === '"'){ inQ = false; i++; continue; }
+          cur += ch; i++; continue;
+        }else{
+          if(ch === '"'){ inQ = true; i++; continue; }
+          if(ch === ','){ row.push(cur); cur=""; i++; continue; }
+          if(ch === '\r'){ i++; continue; }
+          if(ch === '\n'){ row.push(cur); rows.push(row); row=[]; cur=""; i++; continue; }
+          cur += ch; i++; continue;
+        }
+      }
+      if(cur.length || row.length) { row.push(cur); rows.push(row); }
+      return rows;
+    }
+
+    /* Excel/Sheets serial date -> dd/mm/yyyy */
+    const d2 = n => n<10 ? "0"+n : n;
+    function excelSerialToDate(serial){
+      const base = new Date(Date.UTC(1899,11,30));
+      const t = base.getTime() + Number(serial)*86400000;
+      const d = new Date(t);
+      return `${d2(d.getUTCDate())}/${d2(d.getUTCMonth()+1)}/${d.getUTCFullYear()}`;
+    }
+    function isLikelySerial(v){
+      if(!/^\d+$/.test(v)) return false;
+      const n = Number(v);
+      return n >= 30000 && n <= 60000; // rough modern dates
+    }
+    function isDateText(v){
+      return /^(0?[1-9]|[12]\d|3[01])[\/]{1,2}(0?[1-9]|1[0-2])[\/]{1,2}(19|20)\d{2}$/.test(v.trim());
+    }
+    function cleanDateOrValue(raw){
+      const v = raw.trim().replaceAll("//","/");
+      if(!v) return `<span class="chip muted">—</span>`;
+      if(/^n$/i.test(v)) return `<span class="chip no">❌ Not done</span>`;
+      if(isLikelySerial(v)) return `<span class="chip ok">✅ ${excelSerialToDate(v)}</span>`;
+      if(isDateText(v)) {
+        const p = v.split(/[\/]+/); const dd=d2(+p[0]), mm=d2(+p[1]), yy=p[2];
+        return `<span class="chip ok">✅ ${dd}/${mm}/${yy}</span>`;
+      }
+      return `<span class="chip ok">✅ ${v}</span>`;
+    }
+
+    function render(matrix){
+      if(!matrix || !matrix.length){ thead.innerHTML=""; tbody.innerHTML=""; return; }
+
+      const headers = matrix[0];
+      const body = matrix.slice(1);
+
+      // Build header with sticky first two columns and wider widths
+      const h = headers.map((txt, i) => {
+        if(i===0) return `<th class="sticky-1 col-code">${txt}</th>`;
+        if(i===1) return `<th class="sticky-2 col-topic">${txt}</th>`;
+        return `<th class="col-student">${txt}</th>`;
+      }).join("");
+      thead.innerHTML = `<tr>${h}</tr>`;
+
+      // Build rows (first two columns plain, others as chips)
+      tbody.innerHTML = body.map(r => {
+        return "<tr>" + r.map((cell, i) => {
+          const value = (cell ?? "").toString();
+          if(i===0) return `<td class="sticky-1 col-code">${value}</td>`;
+          if(i===1) return `<td class="sticky-2 col-topic">${value}</td>`;
+          return `<td class="col-student">${cleanDateOrValue(value)}</td>`;
+        }).join("") + "</tr>";
+      }).join("");
+    }
+
+    async function load(){
+      try{
+        const res = await fetch(sheetUrl + "&v=" + Date.now()); // cache-bust
+        const text = await res.text();
+        const rows = parseCSV(text);
+        render(rows);
+        const now = new Date();
+        updated.textContent = `Last updated: ${now.toLocaleTimeString()}`;
+      }catch(e){
+        console.error(e);
+        updated.textContent = "Error fetching data. Check CSV publishing.";
+      }
+    }
+
+    load();
+    setInterval(load, 120000); // refresh every 2 minutes
+  </script>
+</body>
+</html>
